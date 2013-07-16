@@ -36,6 +36,41 @@ class HSI(QWidget):
         self.cx = self.width() / 2
         self.cy = self.height() / 2 + self.fontSize / 2 + 7
         self.r = self.height() / 2 - 21
+        self.background = QPixmap(self.r*2+2, self.r*2+2)
+        f = QFont()
+        f.setPixelSize(self.fontSize)
+        p = QPainter(self.background)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setFont(f)
+        
+        compassPen = QPen(QColor(Qt.white))
+        compassBrush = QBrush(QColor(Qt.white))
+        compassPen.setWidth(2)
+        p.setPen(compassPen)
+        # Compass Setup
+        center = QPointF(p.device().width()/2, p.device().height()/2)
+        p.drawEllipse(center, self.r,self.r)
+
+        #p.save()
+        p.translate(p.device().width()/2, p.device().height()/2)
+        p.rotate(-(self._heading)+1)
+        
+        longLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize))
+        shortLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize/2))
+        textRect = QRect(-40, -self.r+self.fontSize, 80, self.fontSize+10)
+        for count in range(0, 360, 5):
+            if count % 10 == 0: 
+                p.drawLine(longLine)
+                if count % 90 == 0:
+                    p.drawText(textRect, Qt.AlignHCenter|Qt.AlignVCenter, 
+                               self.cardinal[int(count/90)])
+                elif count % 30 == 0:
+                    p.drawText(textRect, Qt.AlignHCenter|Qt.AlignVCenter, 
+                               str(int(count/10)))
+            else:
+                p.drawLine(shortLine)
+            p.rotate(5)
+        
         
     def paintEvent(self, event):
         c = QPainter(self)
@@ -61,36 +96,16 @@ class HSI(QWidget):
 
         # Compass Setup
         c.setPen(compassPen)
-        c.drawPoint(self.cx, self.cy)
         tr = QRect(self.cx-self.fontSize*1.5, 3, 
                    self.fontSize * 3, self.fontSize + 5)
         c.drawText(tr, Qt.AlignHCenter|Qt.AlignVCenter,
                    str(int(self._heading)))
         c.drawRect(tr)
 
-        # Compass Setup
-        center = QPointF(self.cx, self.cy)
-        c.drawEllipse(center, self.r,self.r)
-
         c.save()
         c.translate(self.cx, self.cy)
         c.rotate(-(self._heading))
-        
-        longLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize))
-        shortLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize/2))
-        textRect = QRect(-40, -self.r+self.fontSize, 80, self.fontSize+10)
-        for count in range(0, 360, 5):
-            if count % 10 == 0: 
-                c.drawLine(longLine)
-                if count % 90 == 0:
-                    c.drawText(textRect, Qt.AlignHCenter|Qt.AlignVCenter, 
-                               self.cardinal[int(count/90)])
-                elif count % 30 == 0:
-                    c.drawText(textRect, Qt.AlignHCenter|Qt.AlignVCenter, 
-                               str(int(count/10)))
-            else:
-                c.drawLine(shortLine)
-            c.rotate(5)
+        c.drawPixmap(-self.background.width()/2, -self.background.height()/2, self.background)
 
         #Draw Heading Bug
         c.setPen(headingPen)
