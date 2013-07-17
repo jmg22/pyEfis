@@ -19,6 +19,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import PyQt4.Qt
 import math
+import efis
 
 class HSI(QWidget):
     def __init__(self, parent=None):
@@ -134,7 +135,7 @@ class HSI(QWidget):
 
     def setHeading(self, heading):
         if heading != self._heading:
-            self._heading = heading
+            self._heading = efis.bounds(0,360,heading)
             self.update()
 
     heading = property(getHeading, setHeading)
@@ -144,7 +145,7 @@ class HSI(QWidget):
 
     def setHeadingBug(self, headingBug):
         if headingBug != self._headingSelect:
-            self._headingSelect = headingBug
+            self._headingSelect = efis.bounds(0,360,headingBug)
             self.update()
 	
 
