@@ -50,11 +50,11 @@ class HSI(QWidget):
         p.setPen(compassPen)
         # Compass Setup
         center = QPointF(p.device().width()/2, p.device().height()/2)
+        p.fillRect(0, 0, self.width(), self.height(), Qt.black)
         p.drawEllipse(center, self.r,self.r)
 
-        #p.save()
         p.translate(p.device().width()/2, p.device().height()/2)
-        p.rotate(-(self._heading)+1)
+       # p.rotate(-(self._heading)+1)
         
         longLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize))
         shortLine = QLine(0 , -self.r, 0, -(self.r-self.fontSize/2))
@@ -72,7 +72,6 @@ class HSI(QWidget):
                 p.drawLine(shortLine)
             p.rotate(5)
         
-        
     def paintEvent(self, event):
         c = QPainter(self)
         c.setRenderHint(QPainter.Antialiasing)
@@ -82,7 +81,13 @@ class HSI(QWidget):
         
         #Draw the Black Background
         c.fillRect(0, 0, self.width(), self.height(), Qt.black)
-
+        
+        c.save()
+        c.translate(self.cx, self.cy)
+        c.rotate(-(self._heading))
+        c.drawPixmap(-self.background.width()/2, -self.background.height()/2, self.background)
+        c.restore()
+        
         # Setup Pens
         compassPen = QPen(QColor(Qt.white))
         compassBrush = QBrush(QColor(Qt.white))
@@ -106,8 +111,7 @@ class HSI(QWidget):
         c.save()
         c.translate(self.cx, self.cy)
         c.rotate(-(self._heading))
-        c.drawPixmap(-self.background.width()/2, -self.background.height()/2, self.background)
-
+        
         #Draw Heading Bug
         c.setPen(headingPen)
         c.setBrush(headingBrush)
@@ -118,8 +122,7 @@ class HSI(QWidget):
                              QPoint(-inc, -self.r+1),
                              QPoint(0, -(self.r-inc*2))])
         c.drawPolygon(triangle)
-        c.rotate(-delta)
-
+        
         c.restore()
 
         #Non-moving items
