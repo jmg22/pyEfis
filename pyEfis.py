@@ -36,6 +36,7 @@ import altimeter
 import fgfs
 import vsi
 import rasp
+import pa
 
 global global_test
 # This is a container object to hold the callback for the FIX thread
@@ -101,7 +102,6 @@ class main(QMainWindow):
         self.canAdapter = config.get("CAN-FIX", "canAdapter")
         self.canDevice = config.get("CAN-FIX", "canDevice")
         self.queue = Queue.Queue()
-        self.setupUi(self, test)
         self.start = 0
         if self.screen:
             self.showFullScreen()
@@ -124,74 +124,77 @@ class main(QMainWindow):
             p.setColor(w.backgroundRole(), QColor(self.screenColor))
             w.setPalette(p)
             w.setAutoFillBackground(True)
-        if self.width <= 800:
-            if test == 'rasp':
-                instWidth = self.width - 160
-            else:
-                instWidth = self.width - 410
-        else:
-            if test == 'rasp':
-                instWidth = self.width - 200
-            else:
-                instWidth = self.width - 410
+        instWidth = self.width - 160
         if self.height <= 480:
-            instHeight = self.height - 140
+            instHeight = self.height - 80
         else:
-            instHeight = self.height - 200
+            instHeight = self.height - 100
         self.a = ai.AI(w)
         self.a.resize(instWidth, instHeight)
-        if self.height <= 480:
-            self.a.move(80, 80)
-        else:
-            self.a.move(100, 100) 
+        self.a.move(0, 20)
         
-        self.alt_setting = altimeter.Altimeter_Setting(w)
-        self.alt_Trend = vsi.Alt_Trend_Tape(w)
         self.alt_tape = altimeter.Altimeter_Tape(w)
-        self.as_tape = airspeed.Airspeed_Tape(w)
-        self.as_Trend = vsi.AS_Trend_Tape(w)
-        if self.height <= 480:
-            self.alt_tape.resize(70, instHeight)
-            self.alt_tape.move(instWidth + 90, 80)
-            self.alt_Trend.resize(10, instHeight)
-            self.alt_Trend.move(instWidth + 80, 80)
-            self.alt_setting.resize(90, 60)
-            self.alt_setting.move(instWidth + 80, instHeight + 80)
-            self.as_tape.resize(70, instHeight)
-            self.as_tape.move(0, 80)
-            self.as_Trend.resize(10, instHeight)
-            self.as_Trend.move(70, 80)
-        else:
-            self.alt_tape.resize(90, instHeight)
-            self.alt_tape.move(instWidth + 110, 100)
-            self.alt_Trend.resize(10, instHeight)
-            self.alt_Trend.move(instWidth + 100, 100)
-            self.alt_setting.resize(90, 100)
-            self.alt_setting.move(instWidth + 110, instHeight + 100)
-            self.as_tape.resize(90, instHeight)
-            self.as_tape.move(0, 100)
-            self.as_Trend.resize(10, instHeight)
-            self.as_Trend.move(90, 100)
+        self.alt_tape.resize(70, instHeight)
+        self.alt_tape.move(instWidth - 70, 20)
 
-        self.asd_Box = airspeed.Airspeed_Mode(w)
-        if self.height <= 480:
-            self.asd_Box.resize(90, 60)
-            self.asd_Box.move(0, instHeight + 80)
-        else:
-            self.asd_Box.resize(90, 100)
-            self.asd_Box.move(0, instHeight + 100)
-            
-        self.head_tape = hsi.DG_Tape(w)
-        if self.height <= 480:
-            self.head_tape.resize(instWidth, 60)
-            self.head_tape.move(100, instHeight + 80)
-        else:
-            self.head_tape.resize(instWidth, 100)
-            self.head_tape.move(100, instHeight + 100)
+        self.alt_Trend = vsi.Alt_Trend_Tape(w)    
+        self.alt_Trend.resize(10, instHeight)
+        self.alt_Trend.move(instWidth - 80, 20)
+
+        self.alt_setting = altimeter.Altimeter_Setting(w)    
+        self.alt_setting.resize(90, 50)
+        self.alt_setting.move(instWidth - 80, instHeight + 20)
+
+        self.as_tape = airspeed.Airspeed_Tape(w)    
+        self.as_tape.resize(70, instHeight)
+        self.as_tape.move(0, 20)
+
+        self.as_Trend = vsi.AS_Trend_Tape(w)    
+        self.as_Trend.resize(10, instHeight)
+        self.as_Trend.move(70, 20)
+
+        self.asd_Box = airspeed.Airspeed_Mode(w)    
+        self.asd_Box.resize(90, 50)
+        self.asd_Box.move(0, instHeight + 20)
+        
+        self.head_tape = hsi.DG_Tape(w)    
+        self.head_tape.resize(instWidth - 160, 60)
+        self.head_tape.move(80, instHeight + 20)
 
         if test == 'rasp':
+
+            self.ias_warning = pa.Panel_Annunciator(w)
+            self.ias_warning.setWARNING_Name("IAS")
+            self.ias_warning.resize(70, 20)
+            self.ias_warning.move(w.width()- 155, 260)
+
+            self.gyro_warning = pa.Panel_Annunciator(w)
+            self.gyro_warning.setWARNING_Name("Gyro")
+            self.gyro_warning.resize(70, 20)
+            self.gyro_warning.move(w.width()- 75, 260)
+
+            self.mag_warning = pa.Panel_Annunciator(w)
+            self.mag_warning.setWARNING_Name("Mag")
+            self.mag_warning.resize(70, 20)
+            self.mag_warning.move(w.width()- 155, 290)
+            
+            self.alt_warning = pa.Panel_Annunciator(w)
+            self.alt_warning.setWARNING_Name("Alt")
+            self.alt_warning.resize(70, 20)
+            self.alt_warning.move(w.width()- 75, 290)
+
+            self.cat_warning = pa.Panel_Annunciator(w)
+            self.cat_warning.setWARNING_Name("CAT")
+            self.cat_warning.resize(70, 20)
+            self.cat_warning.move(w.width()- 155, 320)
+
+            self.oat_warning = pa.Panel_Annunciator(w)
+            self.oat_warning.setWARNING_Name("OAT")
+            self.oat_warning.resize(70, 20)
+            self.oat_warning.move(w.width()-75, 320)
+            
             self.co = gauges.HorizontalBar(w)
-            self.co.name = "Carbon Monoxid"
+            self.co.name = "Carbon Monoxide"
             self.co.units = "ppm"
             self.co.decimalPlaces = 0
             self.co.lowRange = 0.0
@@ -200,8 +203,8 @@ class main(QMainWindow):
             self.co.highAlarm = 50.0
             self.co.lowWarn = 0.0
             self.co.lowAlarm = 0.0
-            self.co.resize((w.width()/3)-40, 75)
-            self.co.move(20, 0)
+            self.co.resize(150, 75)
+            self.co.move(w.width() - 155, 20)
             self.co.value = 0
 
             self.volt = gauges.HorizontalBar(w)
@@ -214,23 +217,23 @@ class main(QMainWindow):
             self.volt.highAlarm = 14.0
             self.volt.lowWarn = 10.0
             self.volt.lowAlarm = 9.6
-            self.volt.resize((w.width()/3)-40, 75)
-            self.volt.move((w.width()/3)+20, 0)
+            self.volt.resize(150, 75)
+            self.volt.move(w.width()- 155, 100)
             self.volt.value = 12
 
-            self.oat = gauges.HorizontalBar(w)
-            self.oat.name = "Outside air temp"
-            self.oat.units = "degC"
-            self.oat.decimalPlaces = 1
-            self.oat.lowRange = -40.0
-            self.oat.highRange = 40.0
-            self.oat.highWarn = 30.0
-            self.oat.highAlarm = 35.0
-            self.oat.lowWarn = -20
-            self.oat.lowAlarm = -30
-            self.oat.resize((w.width()/3)-40, 75)
-            self.oat.move(((w.width()/3)*2)+20, 0)
-            self.oat.value = 15
+            self.cat = gauges.HorizontalBar(w)
+            self.cat.name = "Cockpit air temp"
+            self.cat.units = "degC"
+            self.cat.decimalPlaces = 1
+            self.cat.lowRange = -40.0
+            self.cat.highRange = 40.0
+            self.cat.highWarn = 30.0
+            self.cat.highAlarm = 35.0
+            self.cat.lowWarn = -20
+            self.cat.lowAlarm = -30
+            self.cat.resize(150, 75)
+            self.cat.move(w.width()- 155, 180)
+            self.cat.value = 15
 
         else:
             
@@ -241,8 +244,8 @@ class main(QMainWindow):
             self.map_g.highRange = 30.0
             self.map_g.highWarn = 28.0
             self.map_g.highAlarm = 29.0
-            self.map_g.resize(200, 100)
-            self.map_g.move(w.width() - 200, 100)
+            self.map_g.resize(155, 100)
+            self.map_g.move(w.width() - 155, 100)
 
             self.rpm = gauges.RoundGauge(w)
             self.rpm.name = "RPM"
@@ -251,8 +254,8 @@ class main(QMainWindow):
             self.rpm.highRange = 2800.0
             self.rpm.highWarn = 2600.0
             self.rpm.highAlarm = 2760.0
-            self.rpm.resize(200, 100)
-            self.rpm.move(w.width() - 200, 0)
+            self.rpm.resize(155, 100)
+            self.rpm.move(w.width() - 155, 0)
 
             self.op = gauges.HorizontalBar(w)
             self.op.name = "Oil Press"
@@ -264,8 +267,8 @@ class main(QMainWindow):
             self.op.highAlarm = 95.0
             self.op.lowWarn = 45.0
             self.op.lowAlarm = 10.0
-            self.op.resize(190, 75)
-            self.op.move(w.width() - 200, 220)
+            self.op.resize(150, 75)
+            self.op.move(w.width() - 155, 220)
             self.op.value = 45.2
 
             self.ot = gauges.HorizontalBar(w)
@@ -278,8 +281,8 @@ class main(QMainWindow):
             self.ot.highAlarm = 230.0
             self.ot.lowWarn = None
             self.ot.lowAlarm = None
-            self.ot.resize(190, 75)
-            self.ot.move(w.width() - 200, 300)
+            self.ot.resize(150, 75)
+            self.ot.move(w.width() - 155, 300)
             self.ot.value = 215.2
 
             self.fuel = gauges.HorizontalBar(w)
@@ -289,8 +292,8 @@ class main(QMainWindow):
             self.fuel.lowRange = 0.0
             self.fuel.highRange = 50.0
             self.fuel.lowWarn = 2.0
-            self.fuel.resize(190, 75)
-            self.fuel.move(w.width() - 200, 380)
+            self.fuel.resize(150, 75)
+            self.fuel.move(w.width() - 155, 380)
             self.fuel.value = 15.2
 
             self.ff = gauges.HorizontalBar(w)
@@ -303,8 +306,8 @@ class main(QMainWindow):
             self.ff.highAlarm = None
             self.ff.lowWarn = None
             self.ff.lowAlarm = None
-            self.ff.resize(190, 75)
-            self.ff.move(w.width() - 200, 460)
+            self.ff.resize(150, 75)
+            self.ff.move(w.width() - 155, 460)
             self.ff.value = 5.2
 
             cht = gauges.HorizontalBar(w)
@@ -315,8 +318,8 @@ class main(QMainWindow):
             cht.highRange = 500.0
             cht.highWarn = 380
             cht.highAlarm = 400
-            cht.resize(190, 75)
-            cht.move(w.width() - 200, 540)
+            cht.resize(150, 75)
+            cht.move(w.width() - 155, 540)
             cht.value = 350
 
             self.egt = gauges.HorizontalBar(w)
@@ -325,8 +328,8 @@ class main(QMainWindow):
             self.egt.decimalPlaces = 0
             self.egt.lowRange = 0.0
             self.egt.highRange = 1500.0
-            self.egt.resize(190, 75)
-            self.egt.move(w.width() - 200, 620)
+            self.egt.resize(150, 75)
+            self.egt.move(w.width() - 155, 620)
             self.egt.value = 1350
 
         if test == 'normal':
@@ -363,7 +366,7 @@ class main(QMainWindow):
             QObject.connect(self.timer,
                                SIGNAL("timeout()"), self.guiUpdate)
             # Start the timer 1 msec update
-            self.timer.start(20)
+            self.timer.start(6)
 
             self.thread1 = rasp.GPIO_Process(self.queue)
             self.thread1.start()
@@ -385,16 +388,24 @@ class main(QMainWindow):
             if global_test == 'rasp':
                 try:
                     self.as_tape.setAirspeed(float(msg[0]))
-                    self.asd_Box.setAS_Data(float(msg[0]), float(msg[4]), float(msg[6]))
+                    self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[6]))
                     self.a.setPitchAngle(float(msg[1]))
                     self.a.setRollAngle(float(msg[2]))
                     self.head_tape.setHeading(float(msg[3]))
-                    self.alt_tape.setAltimeter(self.MSL_Altitude(float(msg[4])))
+                    self.alt_tape.setAltimeter(self.MSL_Altitude(int(msg[4])))
                     self.as_Trend.setAS_Trend(float(msg[0]))
                     self.alt_Trend.setAlt_Trend(float(msg[4]))
                     self.co.setValue(float(msg[5]))
                     self.volt.setValue(float(msg[6]))
-                    self.oat.setValue(float(msg[7]))
+                    self.cat.setValue(float(msg[7]))
+                    self.alt_setting.setAltimeter_Setting(float(msg[8]))
+                    self.alt_warning.setState(int(msg[9]))
+                    self.cat_warning.setState(int(msg[10]))
+                    self.gyro_warning.setState(int(msg[11]))
+                    self.mag_warning.setState(int(msg[12]))
+                    self.ias_warning.setState(int(msg[13]))
+                    self.oat_warning.setState(int(msg[14]))
+                    
                 except:
                     pass
             else:
