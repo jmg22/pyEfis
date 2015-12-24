@@ -126,7 +126,7 @@ class VSI(QWidget):
 class AS_Trend_Tape(QGraphicsView):
     def __init__(self, parent=None):
         super(AS_Trend_Tape, self).__init__(parent)
-        self.setStyleSheet("border: 0px")
+        self.setStyleSheet("background-color: rgba(32, 32, 32, 75%)")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setRenderHint(QPainter.Antialiasing)
@@ -146,7 +146,7 @@ class AS_Trend_Tape(QGraphicsView):
         self.scene = QGraphicsScene(0, 0, w, h)
 
         self.scene.addRect(0, 0, w, h,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                           QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10)))
 
         self.scene.addLine(0, h / 2,
                            w, h / 2,
@@ -157,7 +157,7 @@ class AS_Trend_Tape(QGraphicsView):
     def redraw(self):
         self.scene.clear()
         self.scene.addRect(0, 0, self.width(), self.height(),
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                          QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10))) 
 
         self.scene.addLine(0, self.height() / 2,
                            self.width(), self.height() / 2,
@@ -195,7 +195,7 @@ class AS_Trend_Tape(QGraphicsView):
 class Alt_Trend_Tape(QGraphicsView):
     def __init__(self, parent=None):
         super(Alt_Trend_Tape, self).__init__(parent)
-        self.setStyleSheet("border: 0px")
+        self.setStyleSheet("background-color: rgba(32, 32, 32, 75%)")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setRenderHint(QPainter.Antialiasing)
@@ -215,14 +215,14 @@ class Alt_Trend_Tape(QGraphicsView):
         self.scene = QGraphicsScene(0, 0, w, h)
 
         self.scene.addRect(0, 0, w, h,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                            QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10))) 
 
         self.setScene(self.scene)
 
     def redraw(self):
         self.scene.clear()
         self.scene.addRect(0, 0, self.width(), self.height(),
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                            QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10)))
 
         self.scene.addLine(0, self.height() / 2,
                            self.width(), self.height() / 2,
