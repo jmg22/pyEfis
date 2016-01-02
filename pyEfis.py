@@ -37,6 +37,7 @@ import fgfs
 import vsi
 import rasp
 import pa
+import tc
 
 global global_test
 # This is a container object to hold the callback for the FIX thread
@@ -102,6 +103,7 @@ class main(QMainWindow):
         self.canAdapter = config.get("CAN-FIX", "canAdapter")
         self.canDevice = config.get("CAN-FIX", "canDevice")
         self.queue = Queue.Queue()
+        self.queue2 = Queue.Queue()
         self.start = 0
         if self.screen:
             self.showFullScreen()
@@ -161,37 +163,41 @@ class main(QMainWindow):
         self.head_tape.resize(instWidth - 160, 60)
         self.head_tape.move(80, instHeight + 20)
 
+        self.tC_Tape = tc.TurnCoordinator_Tape(w)
+        self.tC_Tape.resize(instWidth / 4, 18)
+        self.tC_Tape.move((instWidth - (instWidth / 4))/2, 1)
+
         if test == 'rasp':
 
             self.ias_warning = pa.Panel_Annunciator(w)
             self.ias_warning.setWARNING_Name("IAS")
             self.ias_warning.resize(70, 20)
-            self.ias_warning.move(w.width()- 155, 260)
+            self.ias_warning.move(w.width()- 155, 310)
 
             self.gyro_warning = pa.Panel_Annunciator(w)
             self.gyro_warning.setWARNING_Name("Gyro")
             self.gyro_warning.resize(70, 20)
-            self.gyro_warning.move(w.width()- 75, 260)
+            self.gyro_warning.move(w.width()- 75, 310)
 
             self.mag_warning = pa.Panel_Annunciator(w)
             self.mag_warning.setWARNING_Name("Mag")
             self.mag_warning.resize(70, 20)
-            self.mag_warning.move(w.width()- 155, 290)
+            self.mag_warning.move(w.width()- 155, 340)
             
             self.alt_warning = pa.Panel_Annunciator(w)
             self.alt_warning.setWARNING_Name("Alt")
             self.alt_warning.resize(70, 20)
-            self.alt_warning.move(w.width()- 75, 290)
+            self.alt_warning.move(w.width()- 75, 340)
 
             self.cat_warning = pa.Panel_Annunciator(w)
             self.cat_warning.setWARNING_Name("CAT")
             self.cat_warning.resize(70, 20)
-            self.cat_warning.move(w.width()- 155, 320)
+            self.cat_warning.move(w.width()- 155, 370)
 
             self.oat_warning = pa.Panel_Annunciator(w)
             self.oat_warning.setWARNING_Name("OAT")
             self.oat_warning.resize(70, 20)
-            self.oat_warning.move(w.width()-75, 320)
+            self.oat_warning.move(w.width()-75, 370)
             
             self.co = gauges.HorizontalBar(w)
             self.co.name = "Carbon Monoxide"
@@ -203,7 +209,7 @@ class main(QMainWindow):
             self.co.highAlarm = 50.0
             self.co.lowWarn = 0.0
             self.co.lowAlarm = 0.0
-            self.co.resize(150, 75)
+            self.co.resize(150, 70)
             self.co.move(w.width() - 155, 20)
             self.co.value = 0
 
@@ -217,8 +223,8 @@ class main(QMainWindow):
             self.volt.highAlarm = 14.0
             self.volt.lowWarn = 10.0
             self.volt.lowAlarm = 9.6
-            self.volt.resize(150, 75)
-            self.volt.move(w.width()- 155, 100)
+            self.volt.resize(150, 70)
+            self.volt.move(w.width()- 155, 90)
             self.volt.value = 12
 
             self.cat = gauges.HorizontalBar(w)
@@ -231,9 +237,23 @@ class main(QMainWindow):
             self.cat.highAlarm = 35.0
             self.cat.lowWarn = -20
             self.cat.lowAlarm = -30
-            self.cat.resize(150, 75)
-            self.cat.move(w.width()- 155, 180)
+            self.cat.resize(150, 70)
+            self.cat.move(w.width()- 155, 160)
             self.cat.value = 15
+
+            self.oat = gauges.HorizontalBar(w)
+            self.oat.name = "Outside air temp"
+            self.oat.units = "degC"
+            self.oat.decimalPlaces = 1
+            self.oat.lowRange = -40.0
+            self.oat.highRange = 40.0
+            self.oat.highWarn = 30.0
+            self.oat.highAlarm = 35.0
+            self.oat.lowWarn = -20
+            self.oat.lowAlarm = -30
+            self.oat.resize(150, 70)
+            self.oat.move(w.width()- 155, 230)
+            self.oat.value = 15
 
         else:
             
@@ -366,10 +386,13 @@ class main(QMainWindow):
             QObject.connect(self.timer,
                                SIGNAL("timeout()"), self.guiUpdate)
             # Start the timer 1 msec update
-            self.timer.start(6)
+            self.timer.start(5)
 
             self.thread1 = rasp.GPIO_Process(self.queue)
             self.thread1.start()
+
+            self.thread2 = rasp.VW(self.queue2)
+            self.thread2.start()
 
     def MSL_Altitude(self, pressure_alt):
         MSL_atl = pressure_alt - std_atm.press2alt(
@@ -382,29 +405,41 @@ class main(QMainWindow):
         """
         try:
             msg = self.queue.get(0)
-
+            msg2 = self.queue2.get(0)
             msg = msg.split(',')
+            msg2 = msg2.split(',')
             
             if global_test == 'rasp':
                 try:
-                    self.as_tape.setAirspeed(float(msg[0]))
-                    self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[6]))
+                    if msg2 is not None
+                        self.as_tape.setAirspeed(float(msg2[0]))
+                        self.asd_Box.setAS_Data(float(msg2[0]), int(msg[4]), float(msg[6]))
+                        self.as_Trend.setAS_Trend(float(msg2[0]))
+                        self.oat.setValue(float(msg2[1]))
+                        self.ias_warning.setState(int(msg2[2]))
+                        self.oat_warning.setState(int(msg2[3]))
+                    else
+                        self.as_tape.setAirspeed(float(msg[0]))
+                        self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[6]))
+                        self.as_Trend.setAS_Trend(float(msg[0]))
+                        self.oat.setValue(float(msg[9]))
+                        self.ias_warning.setState(int(msg[10]))
+                        self.oat_warning.setState(int(msg[14]))
+                        
+                        
                     self.a.setPitchAngle(float(msg[1]))
                     self.a.setRollAngle(float(msg[2]))
                     self.head_tape.setHeading(float(msg[3]))
                     self.alt_tape.setAltimeter(self.MSL_Altitude(int(msg[4])))
-                    self.as_Trend.setAS_Trend(float(msg[0]))
                     self.alt_Trend.setAlt_Trend(float(msg[4]))
                     self.co.setValue(float(msg[5]))
                     self.volt.setValue(float(msg[6]))
                     self.cat.setValue(float(msg[7]))
                     self.alt_setting.setAltimeter_Setting(float(msg[8]))
-                    self.alt_warning.setState(int(msg[9]))
-                    self.cat_warning.setState(int(msg[10]))
                     self.gyro_warning.setState(int(msg[11]))
                     self.mag_warning.setState(int(msg[12]))
-                    self.ias_warning.setState(int(msg[13]))
-                    self.oat_warning.setState(int(msg[14]))
+                    self.alt_warning.setState(int(msg[13]))
+                    self.cat_warning.setState(int(msg[15]))
                     
                 except:
                     pass
@@ -441,6 +476,8 @@ class main(QMainWindow):
         try:
             self.thread1.stop()
             self.thread1.join(0)
+            self.thread2.stop()
+            self.thread2.join(0)
         except:
             pass
 
