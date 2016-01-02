@@ -411,14 +411,14 @@ class main(QMainWindow):
             
             if global_test == 'rasp':
                 try:
-                    if msg2 is not None
+                    if msg2 is not None:
                         self.as_tape.setAirspeed(float(msg2[0]))
                         self.asd_Box.setAS_Data(float(msg2[0]), int(msg[4]), float(msg[6]))
                         self.as_Trend.setAS_Trend(float(msg2[0]))
                         self.oat.setValue(float(msg2[1]))
                         self.ias_warning.setState(int(msg2[2]))
                         self.oat_warning.setState(int(msg2[3]))
-                    else
+                    else:
                         self.as_tape.setAirspeed(float(msg[0]))
                         self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[6]))
                         self.as_Trend.setAS_Trend(float(msg[0]))
