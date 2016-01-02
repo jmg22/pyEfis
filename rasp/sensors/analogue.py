@@ -24,7 +24,10 @@ class Analogue(sensor.Sensor):
 			self.valSymbol = "mV"
 		
 	def getVal(self):
-		result = self.adc.readADC(self.adcPin)
+                try:
+                        result = self.adc.readADC(self.adcPin)
+                except:
+                        pass
 		if result==0:
 			print "Check wiring for the " + self.sensorName + " measurement, no voltage detected on ADC input " + str(self.adcPin)
 			return None
