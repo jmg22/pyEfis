@@ -256,13 +256,14 @@ class Airspeed_Mode(QGraphicsView):
         self.setFocusPolicy(Qt.NoFocus)
         self._Mode_Indicator = 0
         self._AS_Data_Box = 0
-        self._airspeed_mode = "IAS"
+        self._airspeed_mode = "IAS kts"
 
     def resizeEvent(self, event):
         self.w = self.width()
         self.h = self.height()
         self.f = QFont()
-        self.f.setPixelSize(20)
+        self.f.setBold(True)
+        self.f.setPixelSize(16)
 
         dialPen = QPen(QColor(Qt.white))
         dialPen.setWidth(2)
@@ -274,17 +275,9 @@ class Airspeed_Mode(QGraphicsView):
         t = self.scene.addText(self._airspeed_mode)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0 , 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY((self.h - t.boundingRect().height()) / 2 - (
-                                    t.boundingRect().height() / 2))
-        t = self.scene.addText(str(self._AS_Data_Box))
-        t.setFont(self.f)
-        self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
-        t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY(((self.h - t.boundingRect().height()) / 2) + (
-                                    t.boundingRect().height() / 2))
+        t.setY(self.h - t.boundingRect().height() + 4)
         self.setScene(self.scene)
 
     def redraw(self):
@@ -294,17 +287,93 @@ class Airspeed_Mode(QGraphicsView):
         t = self.scene.addText(self._airspeed_mode)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0 , 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY((self.h - t.boundingRect().height()) / 2 - (
-                                    t.boundingRect().height() / 2))
+        t.setY(self.h - t.boundingRect().height() + 4)
+        self.setScene(self.scene)
+
+    def getMode(self):
+        return self._Mode_Indicator
+
+    def setMode(self, Mode):
+        if Mode != self._Mode_Indicator:
+            if Mode == 0:
+                self._Mode_Indicator = 0
+                self._airspeed_mode = "IAS kts"
+            elif Mode == 1:
+                self._Mode_Indicator = 1
+                self._airspeed_mode = "TAS kts"
+            elif Mode == 2:
+                self._Mode_Indicator = 2
+                self._airspeed_mode = "GS kts"
+            elif Mode == 3:
+                self._Mode_Indicator = 0
+                self._airspeed_mode = "IAS kts"
+            self.redraw()
+
+    def getAS_Data(self):
+        return self._Mode_Indicator
+
+    def setAS_Data(self, AS_Data, PA_Data, OAT):
+        if self._Mode_Indicator == 1:
+            self._AS_Data_Box = int(airspeed.cas2tas(AS_Data, PA_Data, OAT))
+        elif AS_Data != self._AS_Data_Box and self._Mode_Indicator != 1:
+            if self._Mode_Indicator == 0:
+                self._AS_Data_Box = int(AS_Data)
+            elif self._Mode_Indicator == 2:
+                self._AS_Data_Box = int(AS_Data)
+        self.redraw()
+        
+    def setIAS(self, IAS):
+        self.setAS_Data(IAS, 0, 0)
+
+    airspeed_mode = property(getMode, setMode, getAS_Data, setAS_Data)
+
+class Airspeed_Digit(QGraphicsView):
+    def __init__(self, parent=None):
+        super(Airspeed_Digit, self).__init__(parent)
+        self.setStyleSheet("border: 0px")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setFocusPolicy(Qt.NoFocus)
+        self._Mode_Indicator = 0
+        self._AS_Data_Box = 0
+        self._airspeed_mode = "IAS"
+
+    def resizeEvent(self, event):
+        self.w = self.width()
+        self.h = self.height()
+        self.f = QFont()
+        self.f.setBold(True)
+        self.f.setPixelSize(24)
+
+        dialPen = QPen(QColor(Qt.white))
+        dialPen.setWidth(2)
+
+        self.scene = QGraphicsScene(0, 0, self.w, self.h)
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+
         t = self.scene.addText(str(self._AS_Data_Box))
         t.setFont(self.f)
         self.scene.setFont(self.f)
         t.setDefaultTextColor(QColor(Qt.white))
         t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY(((self.h - t.boundingRect().height()) / 2) + (
-                                    t.boundingRect().height() / 2))
+        t.setY(self.h - t.boundingRect().height() + 5)
+        self.setScene(self.scene)
+
+    def redraw(self):
+        self.scene.clear()
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+        
+        t = self.scene.addText(str(self._AS_Data_Box))
+        t.setFont(self.f)
+        self.scene.setFont(self.f)
+        t.setDefaultTextColor(QColor(Qt.white))
+        t.setX((self.w - t.boundingRect().width()) / 2)
+        t.setY(self.h - t.boundingRect().height() + 5)
         self.setScene(self.scene)
 
     def getMode(self):

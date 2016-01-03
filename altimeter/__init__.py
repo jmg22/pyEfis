@@ -191,7 +191,8 @@ class Altimeter_Setting(QGraphicsView):
         self.w = self.width()
         self.h = self.height()
         self.f = QFont()
-        self.f.setPixelSize(20)
+        self.f.setBold(True)
+        self.f.setPixelSize(18)
 
         dialPen = QPen(QColor(Qt.white))
         dialPen.setWidth(2)
@@ -200,10 +201,10 @@ class Altimeter_Setting(QGraphicsView):
         self.scene.addRect(0, 0, self.w, self.h,
                            QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
 
-        t = self.scene.addText("%0.2f" % self._altimeter_setting)
+        t = self.scene.addText("%0.2f hg" % self._altimeter_setting)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0, 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
         t.setY((self.h - t.boundingRect().height()) / 2)
         self.setScene(self.scene)
@@ -212,10 +213,10 @@ class Altimeter_Setting(QGraphicsView):
         self.scene.clear()
         self.scene.addRect(0, 0, self.w, self.h,
                            QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
-        t = self.scene.addText("%0.2f" % self._altimeter_setting)
+        t = self.scene.addText("%0.2f hg" % self._altimeter_setting)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0, 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
         t.setY((self.h - t.boundingRect().height()) / 2)
         self.setScene(self.scene)
@@ -227,3 +228,59 @@ class Altimeter_Setting(QGraphicsView):
         if altimeter_setting != self._altimeter_setting:
             self._altimeter_setting = altimeter_setting
             self.redraw()
+
+class Altimeter_Digit(QGraphicsView):
+    def __init__(self, parent=None):
+        super(Altimeter_Digit, self).__init__(parent)
+        self.setStyleSheet("border: 0px")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setFocusPolicy(Qt.NoFocus)
+        self._altimeter = 0
+        self.test = Altimeter_Setting()
+
+    def resizeEvent(self, event):
+        self.w = self.width()
+        self.h = self.height()
+        self.f = QFont()
+        self.f.setBold(True)
+        self.f.setPixelSize(24)
+
+        dialPen = QPen(QColor(Qt.white))
+        dialPen.setWidth(2)
+
+        self.scene = QGraphicsScene(0, 0, self.w, self.h)
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+
+        t = self.scene.addText(str(self._altimeter))
+        t.setFont(self.f)
+        self.scene.setFont(self.f)
+        t.setDefaultTextColor(QColor(Qt.white))
+        t.setX((self.w - t.boundingRect().width()) / 2)
+        t.setY(self.h - t.boundingRect().height() + 5)
+        self.setScene(self.scene)
+
+    def redraw(self):
+        self.scene.clear()
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+        
+        t = self.scene.addText(str(self._altimeter))
+        t.setFont(self.f)
+        self.scene.setFont(self.f)
+        t.setDefaultTextColor(QColor(Qt.white))
+        t.setX((self.w - t.boundingRect().width()) / 2)
+        t.setY(self.h - t.boundingRect().height() + 5)
+        self.setScene(self.scene)    
+
+    def getAltimeter(self):
+        return self._altimeter
+
+    def setAltimeter(self, altimeter):
+        if altimeter != self._altimeter:
+            self._altimeter = int(altimeter)
+            self.redraw()
+
+    altimeter = property(getAltimeter, setAltimeter)
