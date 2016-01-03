@@ -42,9 +42,9 @@ class Panel_Annunciator(QGraphicsView):
 
         self.scene = QGraphicsScene(0, 0, self.w, self.h)
         self.scene.addRect(0, 0, self.w, self.h,
-                           QPen(QColor(Qt.gray)), QBrush(QColor(Qt.black)))
+                           QPen(QColor(Qt.gray)), QBrush(QColor(24, 24, 24)))
         self.scene.addRect(1, 1, self.w -2, self.h -2,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.transparent)))
+                           QPen(QColor(24, 24, 24)), QBrush(QColor(Qt.transparent)))
         t = self.scene.addText(str(self.Warning_State_Label))
         t.setFont(self.f)
         self.scene.setFont(self.f)
@@ -58,7 +58,7 @@ class Panel_Annunciator(QGraphicsView):
         self.scene.addRect(0, 0, self.w, self.h,
                            self.pcolor, self.bcolor)
         self.scene.addRect(1, 1, self.w -2, self.h -2,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.transparent)))
+                           QPen(QColor(24, 24, 24)), QBrush(QColor(Qt.transparent)))
         t = self.scene.addText(str(self.Warning_State_Label))
         t.setFont(self.f)
         self.scene.setFont(self.f)
@@ -75,7 +75,7 @@ class Panel_Annunciator(QGraphicsView):
         if Mode != self._Mode_Indicator:
             if Mode == 0:
                 self._Mode_Indicator = 0
-                self.bcolor = QBrush(QColor(Qt.black))
+                self.bcolor = QBrush(QColor(24, 24, 24))
                 self.pcolor = QPen(QColor(Qt.gray))
             elif Mode == 1:
                 self._Mode_Indicator = 1
