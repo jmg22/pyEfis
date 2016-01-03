@@ -127,10 +127,7 @@ class main(QMainWindow):
             w.setPalette(p)
             w.setAutoFillBackground(True)
         instWidth = self.width - 160
-        if self.height <= 480:
-            instHeight = self.height - 80
-        else:
-            instHeight = self.height - 100
+        instHeight = self.height - 80
         self.a = ai.AI(w)
         self.a.resize(instWidth, instHeight)
         self.a.move(0, 20)
@@ -139,13 +136,17 @@ class main(QMainWindow):
         self.alt_tape.resize(70, instHeight)
         self.alt_tape.move(instWidth - 70, 20)
 
+        self.alt_Box = altimeter.Altimeter_Digit(w)
+        self.alt_Box.resize(60, 25)
+        self.alt_Box.move(instWidth - 69,(instHeight / 2) + 7.5)
+
         self.alt_Trend = vsi.Alt_Trend_Tape(w)    
         self.alt_Trend.resize(10, instHeight)
         self.alt_Trend.move(instWidth - 80, 20)
 
         self.alt_setting = altimeter.Altimeter_Setting(w)    
-        self.alt_setting.resize(90, 50)
-        self.alt_setting.move(instWidth - 80, instHeight + 20)
+        self.alt_setting.resize(90, 20)
+        self.alt_setting.move(instWidth - 80, 0)
 
         self.as_tape = airspeed.Airspeed_Tape(w)    
         self.as_tape.resize(70, instHeight)
@@ -156,12 +157,16 @@ class main(QMainWindow):
         self.as_Trend.move(70, 20)
 
         self.asd_Box = airspeed.Airspeed_Mode(w)    
-        self.asd_Box.resize(90, 50)
-        self.asd_Box.move(0, instHeight + 20)
+        self.asd_Box.resize(90, 20)
+        self.asd_Box.move(0, 0)
+
+        self.asdi_Box = airspeed.Airspeed_Digit(w)    
+        self.asdi_Box.resize(45, 25)
+        self.asdi_Box.move(25, (instHeight / 2) + 7.5)
         
         self.head_tape = hsi.DG_Tape(w)    
-        self.head_tape.resize(instWidth - 160, 60)
-        self.head_tape.move(80, instHeight + 20)
+        self.head_tape.resize(instWidth, 60)
+        self.head_tape.move(0, instHeight + 20)
 
         self.tC_Tape = tc.TurnCoordinator_Tape(w)
         self.tC_Tape.resize(instWidth / 4, 18)
@@ -386,7 +391,7 @@ class main(QMainWindow):
             QObject.connect(self.timer,
                                SIGNAL("timeout()"), self.guiUpdate)
             # Start the timer 1 msec update
-            self.timer.start(5)
+            self.timer.start(6)
 
             self.thread1 = rasp.GPIO_Process(self.queue)
             self.thread1.start()
@@ -413,14 +418,16 @@ class main(QMainWindow):
                 try:
                     if msg2 is not None:
                         self.as_tape.setAirspeed(float(msg2[0]))
-                        self.asd_Box.setAS_Data(float(msg2[0]), int(msg[4]), float(msg[6]))
+                        self.asd_Box.setAS_Data(float(msg2[0]), int(msg[4]), float(msg[9]))
+                        self.asdi_Box.setAS_Data(float(msg2[0]), int(msg[4]), float(msg[9]))
                         self.as_Trend.setAS_Trend(float(msg2[0]))
                         self.oat.setValue(float(msg2[1]))
                         self.ias_warning.setState(int(msg2[2]))
                         self.oat_warning.setState(int(msg2[3]))
                     else:
                         self.as_tape.setAirspeed(float(msg[0]))
-                        self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[6]))
+                        self.asd_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[9]))
+                        self.asdi_Box.setAS_Data(float(msg[0]), int(msg[4]), float(msg[9]))
                         self.as_Trend.setAS_Trend(float(msg[0]))
                         self.oat.setValue(float(msg[9]))
                         self.ias_warning.setState(int(msg[10]))
@@ -431,6 +438,7 @@ class main(QMainWindow):
                     self.a.setRollAngle(float(msg[2]))
                     self.head_tape.setHeading(float(msg[3]))
                     self.alt_tape.setAltimeter(self.MSL_Altitude(int(msg[4])))
+                    self.alt_Box.setAltimeter(self.MSL_Altitude(int(msg[4])))
                     self.alt_Trend.setAlt_Trend(float(msg[4]))
                     self.co.setValue(float(msg[5]))
                     self.volt.setValue(float(msg[6]))
