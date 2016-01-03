@@ -21,6 +21,7 @@ class VW(threading.Thread):
         self.oat = 0
         self.ias_W_S = 0
         self.oat_W_S = 0
+        self.smooted = 0.8
         if not os.path.isfile('/home/pi/pyEfis/rasp/virtualwire.cfg'):
                         print "Unable to access config file: virtualwire.cfg"
                         exit(1)
@@ -28,7 +29,7 @@ class VW(threading.Thread):
         sensorConfig.read('/home/pi/pyEfis/rasp/virtualwire.cfg')
         i="VirtualWire"
         sensorNames = sensorConfig.sections()
-        if "VirtualWire" in sensorNames:
+        if i in sensorNames:
             try:
                 enabled = sensorConfig.getboolean(i,"enabled")
             except Exception:
@@ -46,13 +47,17 @@ class VW(threading.Thread):
     def run(self):
         print "Virtualwire thread started"
         while self.running:
-            time.sleep(0.6)
+            time.sleep(0.3)
             try:
                 while self.rx.ready():
-                    msg = str("".join(chr (c) for c in self.rx.get()))
+                    try:
+                        msg = str("".join(chr (c) for c in self.rx.get()))
+                    except:
+                        pass
                 msg = msg.split(',')
                 if float(msg[0]) < 400 :
-                    self.ias = float(msg[0])
+                    ias = float(msg[0])
+                    self.ias = float((self.ias*self.smooted)+(1.0-self.smooted)*(ias))
                     self.ias_W_S = 3
                 if float(msg[1]) > -50 :                   
                     self.oat = float(msg[1])
@@ -275,7 +280,7 @@ class GPIO_Process(threading.Thread):
                 if working != True:
                         print "Failed to upload"
                         
-                time.sleep(.4)
+                time.sleep(.25)
                 data = [self.ias, self.pitch, self.roll, self.heading, self.alt, self.co, self.volt, self.cat, self.hg, self.oat, self.ias_W_S, self.gyro_W_S, self.heading_W_S, self.alt_W_S, self.oat_W_S, self.cat_W_S]
                 data_test = str(data).strip('[]')
                 self.queue.put(data_test)
