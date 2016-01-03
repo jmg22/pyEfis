@@ -159,11 +159,12 @@ class DG_Tape(QGraphicsView):
         headingPen.setWidth(8)
 
         f = QFont()
-        f.setPixelSize(20)
+        f.setBold(True)
+        f.setPixelSize(23)
 
         self.scene = QGraphicsScene(0, 0, 5000, h)
         self.scene.addRect(0, 0, 5000, h,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                           QPen(QColor(32, 32, 32)), QBrush(QColor(24, 24, 24)))
 
         self.setScene(self.scene)
 
@@ -172,19 +173,35 @@ class DG_Tape(QGraphicsView):
                 self.scene.addLine((i * 10) + w / 2, 0, (i * 10) + w / 2, h / 2,
                                    compassPen)
                 if i > 360:
-                    t = self.scene.addText(str(i - 360))
-                    t.setFont(f)
-                    self.scene.setFont(f)
-                    t.setDefaultTextColor(QColor(Qt.white))
-                    t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
-                    t.setY(h - t.boundingRect().height())
+                    if i % 90 == 0:
+                        t = self.scene.addText(self.cardinal[int(i / 9)])
+                        t.setFont(f)
+                        self.scene.setFont(f)
+                        t.setDefaultTextColor(QColor(Qt.cyan))
+                        t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
+                        t.setY(h - t.boundingRect().height())
+                    else:
+                        t = self.scene.addText(str(i - 360))
+                        t.setFont(f)
+                        self.scene.setFont(f)
+                        t.setDefaultTextColor(QColor(Qt.white))
+                        t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
+                        t.setY(h - t.boundingRect().height())
                 elif i < 1:
-                    t = self.scene.addText(str(i + 360))
-                    t.setFont(f)
-                    self.scene.setFont(f)
-                    t.setDefaultTextColor(QColor(Qt.white))
-                    t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
-                    t.setY(h - t.boundingRect().height())
+                    if i % 90 == 0:
+                        t = self.scene.addText(self.cardinal[int(i / 9)])
+                        t.setFont(f)
+                        self.scene.setFont(f)
+                        t.setDefaultTextColor(QColor(Qt.cyan))
+                        t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
+                        t.setY(h - t.boundingRect().height())
+                    else:
+                        t = self.scene.addText(str(i + 360))
+                        t.setFont(f)
+                        self.scene.setFont(f)
+                        t.setDefaultTextColor(QColor(Qt.white))
+                        t.setX(((i * 10) + w / 2) - t.boundingRect().width() / 2)
+                        t.setY(h - t.boundingRect().height())
                 else:
                     t = self.scene.addText(str(i))
                     t.setFont(f)
