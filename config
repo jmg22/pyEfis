@@ -5,7 +5,7 @@ screenSize.Width = 800
 screenSize.Height = 480
 #800
 # Set EFIS to occupy the entire screen without system border / menu
-screenFullSize = False
+screenFullSize = True
 # Screen background color RGB
 screenColor = (0,0,0) #Black
 
