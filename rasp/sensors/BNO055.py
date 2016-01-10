@@ -7,6 +7,8 @@ class BNO055(sensor.Sensor):
 	requiredData = ["measurement","rst"]
 	optionalData = ["unit"]
 	def __init__(self, data):
+                self.statusSample = 0
+                self.sys = 0
 		self.sensorName = "BNO055"
 		if "euler" in data["measurement"].lower():
 			self.valName = "Orientation"
@@ -27,22 +29,44 @@ class BNO055(sensor.Sensor):
                                 BNO055.bnoClass = bnoBackend.BNO055(serial_port='/dev/ttyAMA0', rst=int(data["rst"]))
                         except:
                                 pass
-                    if not BNO055.bnoClass.begin():
-                        #raise RuntimeError('Failed to initialize BNO055! Is the sensor connected?')
+                if not BNO055.bnoClass.begin():
+                        raise RuntimeError('Failed to initialize BNO055! Is the sensor connected?')
                         bnoClass = None
-                        #pass
+                        pass
                         return 
 
 	def getVal(self):
 		if self.valName == "Orientation":
                         try:
                                 heading, roll, pitch = BNO055.bnoClass.read_euler()
+                                x,y,z = BNO055.bnoClass.read_accelerometer()
+                                #print heading, roll, pitch
+                                if pitch >= 90:
+                                        pdiff = pitch - 90
+                                        pitch = 90 - pdiff
+                                        if roll > 0:
+                                                roll = -(roll - 180)
+                                        else:
+                                                roll = -(roll + 180)
+                                elif pitch <= -90:
+                                        mpdiff = pitch + 90
+                                        pitch = -(90 + mpdiff)
+                                        if roll > 0:
+                                                roll = -(roll - 180)
+                                        else:
+                                                roll = -(roll + 180)
+                                if heading >= 180:
+                                        heading = heading - 180
+                                else:
+                                        heading = heading + 180
+                                if self.statusSample >= 200:       
+                                        self.sys, gyro, accel, mag = BNO055.bnoClass.get_calibration_status()
+                                        self.statusSample = 0
+                                else:
+                                        self.statusSample = self.statusSample + 1
                         except:
-                                heading = 1000
-                                roll = 1000
-                                pitch = 1000
                                 pass
-                        return [heading, roll, pitch]
+                        return [heading, roll, pitch, self.sys, x]
                         
 		elif self.valName == "Temperature":
 			temp = BNO055.bnoClass.read_temp()
