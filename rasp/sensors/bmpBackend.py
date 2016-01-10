@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 import logging
 import time
-import math
+
 
 # BMP085 default address.
 BMP085_I2CADDR           = 0x77
@@ -51,8 +51,8 @@ BMP085_PRESSUREDATA      = 0xF6
 BMP085_READTEMPCMD       = 0x2E
 BMP085_READPRESSURECMD   = 0x34
 
-class BMP085(object) :
 
+class BMP085(object):
 	def __init__(self, mode=BMP085_STANDARD, address=BMP085_I2CADDR, i2c=None, **kwargs):
 		self._logger = logging.getLogger('Adafruit_BMP.BMP085')
 		# Check that mode is valid.
@@ -199,5 +199,3 @@ class BMP085(object) :
 		p0 = pressure / pow(1.0 - altitude_m/44330.0, 5.255)
 		self._logger.debug('Sealevel pressure {0} Pa'.format(p0))
 		return p0
-
-
