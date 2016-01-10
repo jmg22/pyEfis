@@ -143,10 +143,10 @@ class TurnCoordinator(QWidget):
             self.update()
 
     latAcc = property(getLatAcc, setLatAcc)
-
-class TurnCoordinator_Tape(QWidget):
+# TODO clean up code  
+class Slip_Tape(QWidget):
     def __init__(self, parent=None):
-        super(TurnCoordinator_Tape, self).__init__(parent)
+        super(Slip_Tape, self).__init__(parent)
         self.setStyleSheet("background-color: rgba(32, 32, 32, 75%)")
         self.setFocusPolicy(Qt.NoFocus)
         self._rate = 0.0
@@ -176,7 +176,7 @@ class TurnCoordinator_Tape(QWidget):
         p.translate(self.center)
         p.restore()
 
-        # TC Box
+        # slip Box
         self.boxHalfWidth = (self.r - length) * math.cos(math.radians(30))
         self.boxTop = self.center.y() + (self.r -
                       length) * math.sin(math.radians(30)) + thickness
@@ -186,7 +186,7 @@ class TurnCoordinator_Tape(QWidget):
         p.drawRect(rect)
         #Draw the little airplane center
         p.drawEllipse(self.center, thickness, thickness)
-        # vertical black lines on TC
+        # vertical black lines on slip
         pen.setColor(QColor(Qt.black))
         pen.setWidth(4)
         p.setPen(pen)
@@ -207,7 +207,7 @@ class TurnCoordinator_Tape(QWidget):
         # Insert Background
         p.drawPixmap(0, 0, self.background)
 
-        # Draw TC Ball
+        # Draw slip Ball
         pen = QPen(QColor(Qt.black))
         brush = QBrush(QColor(Qt.black))
         pen.setWidth(2)
