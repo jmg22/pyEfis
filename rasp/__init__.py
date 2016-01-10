@@ -47,14 +47,17 @@ class VW(threading.Thread):
     def run(self):
         print "Virtualwire thread started"
         while self.running:
-            time.sleep(0.3)
+            time.sleep(.25)
             try:
                 while self.rx.ready():
                     try:
                         msg = str("".join(chr (c) for c in self.rx.get()))
                     except:
+                        msg = [400, -50]
+                        print msg
                         pass
                 msg = msg.split(',')
+                
                 if float(msg[0]) < 400 :
                     ias = float(msg[0])
                     self.ias = float((self.ias*self.smooted)+(1.0-self.smooted)*(ias))
@@ -66,6 +69,8 @@ class VW(threading.Thread):
                     self.ias_W_S = 2
                     self.oat_W_S = 2
             except:
+                self.ias_W_S = 2
+                self.oat_W_S = 2
                 pass
             data = [self.ias, self.oat, self.ias_W_S, self.oat_W_S]
             data_test = str(data).strip('[]')
@@ -98,6 +103,7 @@ class GPIO_Process(threading.Thread):
         self.heading_W_S = 0
         self.ias_W_S = 0
         self.oat_W_S = 0
+        self.slip = 0
         self.smooted = 0.7
        
         def get_subclasses(mod,cls):
@@ -173,7 +179,7 @@ class GPIO_Process(threading.Thread):
                                 print ("Success: Loaded sensor plugin " + i)
                 except Exception as e: #add specific exception for missing module
                         print("Error: Did not import sensor plugin " + i )
-                        #raise e
+                        raise e
         self.running = 1
 
 
@@ -205,20 +211,27 @@ class GPIO_Process(threading.Thread):
                                 pass
                         elif dataDict["name"] == "Orientation":
                                 msg = i.getVal()
+                                #print msg
                                 msg = str(msg).strip('[]')
                                 msg = msg.split(',')
-                                if int(msg[0]) != 1000:
-                                    self.heading = int(msg[0])
-                                    self.roll = int(msg[1])
-                                    self.pitch = int(msg[2])
+                                self.heading = float(msg[0])
+                                self.roll = float(msg[1])
+                                self.pitch = float(msg[2])
+                                self.slip = (float(msg[4])/60)
+                                #print self.slip
+                                if int(msg[3]) == 3:
                                     self.heading_W_S = 3
-                                    self.roll_W_S = 3
-                                    self.pitch_W_S = 3
-                                else:
+                                    self.gyro_W_S = 3
+                                elif int(msg[3]) == 2:
+                                    self.heading_W_S = 1
+                                    self.gyro_W_S = 1
+                                elif int(msg[3]) == 0:
                                     self.heading_W_S = 2
-                                    self.roll_W_S = 2
-                                    self.pitch_W_S = 2
-                                #print msg
+                                    self.gyro_W_S = 2
+                                else:
+                                    self.heading_W_S = 0
+                                    self.gyro_W_S = 0
+                                #print self.pitch
                         elif dataDict["name"] == "Altitude":
                             try:
                                 alt_Value = i.getVal()
@@ -249,7 +262,7 @@ class GPIO_Process(threading.Thread):
                                 #print self.volt
                         elif dataDict["name"] == "CAT":
                             cat_sample += 1
-                            if cat_sample >= 5:
+                            if cat_sample >= 10:
                                 try:
                                     self.cat = i.getVal()
                                     cat_sample = 0
@@ -280,8 +293,8 @@ class GPIO_Process(threading.Thread):
                 if working != True:
                         print "Failed to upload"
                         
-                time.sleep(.25)
-                data = [self.ias, self.pitch, self.roll, self.heading, self.alt, self.co, self.volt, self.cat, self.hg, self.oat, self.ias_W_S, self.gyro_W_S, self.heading_W_S, self.alt_W_S, self.oat_W_S, self.cat_W_S]
+                #time.sleep(.1)
+                data = [self.ias, self.pitch, self.roll, self.heading, self.alt, self.co, self.volt, self.cat, self.hg, self.oat, self.ias_W_S, self.gyro_W_S, self.heading_W_S, self.alt_W_S, self.oat_W_S, self.cat_W_S, self.slip]
                 data_test = str(data).strip('[]')
                 self.queue.put(data_test)
 
