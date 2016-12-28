@@ -36,12 +36,12 @@ class AI(QGraphicsView):
         self.setFocusPolicy(Qt.NoFocus)
         self._rollAngle = 0
         self._pitchAngle = 0
-        self.fontSize = 30
-        # Number of degrees shown from top to bottom
+        self.fontSize = 20
         self.pitchDegreesShown = 60
-
+    
         fix.db.get_item("PITCH", True).valueChanged[float].connect(self.setPitchAngle)
         fix.db.get_item("ROLL", True).valueChanged[float].connect(self.setRollAngle)
+
 
     def resizeEvent(self, event):
         #Setup the scene that we use for the background of the AI
@@ -188,8 +188,7 @@ class AI(QGraphicsView):
     # We don't want this responding to keystrokes
     def keyPressEvent(self, event):
         pass
-
-    # Don't want it acting with the mouse scroll wheel either
+    
     def wheelEvent(self, event):
         pass
 

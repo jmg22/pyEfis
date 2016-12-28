@@ -36,7 +36,6 @@ class Airspeed(QWidget):
         self._airspeed = 0
         fix.db.get_item("IAS", True).valueChanged[float].connect(self.setAirspeed)
 
-
     def paintEvent(self, event):
         w = self.width()
         h = self.height()
@@ -70,12 +69,12 @@ class Airspeed(QWidget):
 
         # Dial Setup
         # V Speeds
-        Vs = 45
-        Vs0 = 40
-        Vno = 125
-        Vne = 140
-        #Va = 120
-        Vfe = 70
+        Vs = 40
+        Vs0 = 38
+        Vno = 80
+    	Vne = 122
+        Va = 60
+        Vfe = 60
 
         # VSpeed to angle for drawArc
         Vs0_angle = (-(((Vs0 - 30) * 2.5) + 26) + 90) * 16
@@ -161,75 +160,85 @@ class Airspeed_Tape(QGraphicsView):
 
     def resizeEvent(self, event):
 
-        # V Speeds
-        #Vs = 45
-        Vs0 = 40
-        Vno = 125
-        Vne = 140
-        #Va = 120
-        Vfe = 70
+	item = fix.db.get_item("IAS", True)
+    #if item.Vs: Vs = item.Vs
+        conversionFunction = lambda x: x
+        
+        if "Vs" in item.aux and item.aux["Vs"] != None:
+		Vs = conversionFunction(item.aux["Vs"])
+        if "Vs0" in item.aux and item.aux["Vs0"] != None:
+            	Vs0 = conversionFunction(item.aux["Vs0"])
+        if "Vno" in item.aux and item.aux["Vno"] != None:
+            	Vno = conversionFunction(item.aux["Vno"])
+        if "Vne" in item.aux and item.aux["Vne"] != None:
+            	Vne = conversionFunction(item.aux["Vne"])
+        if "Va" in item.aux and item.aux["Va"] != None:
+            	Va = conversionFunction(item.aux["Va"])
+        if "Vfe" in item.aux and item.aux["Vfe"] != None:
+            	Vfe = conversionFunction(item.aux["Vfe"])
 
         w = self.width()
         h = self.height()
         self.pph = 10
         f = QFont()
         f.setPixelSize(20)
-        speed_pixel = 1500 + h
+        speed_pixel = 1800 + h
 
         dialPen = QPen(QColor(Qt.white))
         dialPen.setWidth(2)
 
         vnePen = QPen(QColor(Qt.red))
-        vnePen.setWidth(8)
+        vnePen.setWidth(40)
 
         vsoPen = QPen(QColor(Qt.white))
-        vsoPen.setWidth(8)
+        vsoPen.setWidth(20)
 
         vnoPen = QPen(QColor(Qt.green))
-        vnoPen.setWidth(8)
+        vnoPen.setWidth(40)
 
         yellowPen = QPen(QColor(Qt.yellow))
-        yellowPen.setWidth(8)
+        yellowPen.setWidth(40)
 
         self.scene = QGraphicsScene(0, 0, w, speed_pixel)
         self.scene.addRect(0, 0, w, speed_pixel,
                            QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10)))
 
-        for i in range(150, -1, -5):
+        for i in range(180, -1, -5):
             if i % 10 == 0:
-                self.scene.addLine(0, (- i * 10) + 1500 + h / 2, w / 2,
-                                   (- i * 10) + 1500 + h / 2, dialPen)
+                self.scene.addLine(0, (- i * 10) + 1800 + h / 2, w / 2,
+                                   (- i * 10) + 1800 + h / 2, dialPen)
                 t = self.scene.addText(str(i))
                 t.setFont(f)
                 self.scene.setFont(f)
                 t.setDefaultTextColor(QColor(Qt.white))
                 t.setX(w - t.boundingRect().width())
-                t.setY(((- i * 10) + 1500 + h / 2)
+                t.setY(((- i * 10) + 1800 + h / 2)
                        - t.boundingRect().height() / 2)
             else:
-                self.scene.addLine(0, (- i * 10) + 1500 + h / 2, w / 2 - 20,
-                                  (- i * 10) + 1500 + h / 2, dialPen)
+                self.scene.addLine(0, (- i * 10) + 1800 + h / 2, w / 2 - 20,
+                                  (- i * 10) + 1800 + h / 2, dialPen)
 
         #Add Markings
-        self.scene.addLine(4, Vs0 * -self.pph + 1500 + self.height() / 2 - 4,
-                           4, Vfe * -self.pph + 1500 + self.height() / 2 + 4,
-                           vsoPen)
-        self.scene.addLine(4, Vfe * -self.pph + 1500 + self.height() / 2 - 4,
-                           4, Vno * -self.pph + 1500 + self.height() / 2 + 4,
+        self.scene.addLine(4, Vs0 * -self.pph + 1800 + self.height() / 2 - 20,
+                           4, Vno * -self.pph + 1800 + self.height() / 2 + 20,
                            vnoPen)
-        self.scene.addLine(4, Vne * -self.pph + 1500 + self.height() / 2 - 4,
-                           4, Vno * -self.pph + 1500 + self.height() / 2 + 4,
+        self.scene.addLine(4, Vne * -self.pph + 1800 + self.height() / 2 + 20,
+                           4, Vno * -self.pph + 1800 + self.height() / 2 - 20,
                            yellowPen)
-        self.scene.addLine(4, Vne * -self.pph + 1500 + self.height() / 2 - 4,
-                           4, 150 * -self.pph + 1500 + self.height() / 2 + 4,
+        self.scene.addLine(4, Vne * -self.pph + 1800 + self.height() / 2 - 20,
+                           4, 180 * -self.pph + 1800 + self.height() / 2 + 20,
                            vnePen)
+        self.scene.addLine(4, Vs0 * -self.pph + 1800 + self.height() / 2 - 10,
+                           4, Vfe * -self.pph + 1800 + self.height() / 2 + 10,
+                           vsoPen)
+
 
         self.setScene(self.scene)
 
     def redraw(self):
         self.resetTransform()
         self.centerOn(self.scene.width() / 2,
-                      -self._airspeed * self.pph + 1500 + self.height() / 2)
+                      -self._airspeed * self.pph + 1800 + self.height() / 2)
 
 #  Index Line that doesn't move to make it easy to read the airspeed.
     def paintEvent(self, event):
@@ -266,13 +275,14 @@ class Airspeed_Mode(QGraphicsView):
         self.setFocusPolicy(Qt.NoFocus)
         self._Mode_Indicator = 0
         self._AS_Data_Box = 0
-        self._airspeed_mode = "IAS"
+        self._airspeed_mode = "IAS MPH"
 
     def resizeEvent(self, event):
         self.w = self.width()
         self.h = self.height()
         self.f = QFont()
-        self.f.setPixelSize(20)
+        self.f.setBold(True)
+        self.f.setPixelSize(16)
 
         dialPen = QPen(QColor(Qt.white))
         dialPen.setWidth(2)
@@ -284,17 +294,9 @@ class Airspeed_Mode(QGraphicsView):
         t = self.scene.addText(self._airspeed_mode)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0 , 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY((self.h - t.boundingRect().height()) / 2 - (
-                                    t.boundingRect().height() / 2))
-        t = self.scene.addText(str(self._AS_Data_Box))
-        t.setFont(self.f)
-        self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
-        t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY(((self.h - t.boundingRect().height()) / 2) + (
-                                    t.boundingRect().height() / 2))
+        t.setY(self.h - t.boundingRect().height() + 4)
         self.setScene(self.scene)
 
     def redraw(self):
@@ -304,17 +306,9 @@ class Airspeed_Mode(QGraphicsView):
         t = self.scene.addText(self._airspeed_mode)
         t.setFont(self.f)
         self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
+        t.setDefaultTextColor(QColor(255, 0 , 255))
         t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY((self.h - t.boundingRect().height()) / 2 - (
-                                    t.boundingRect().height() / 2))
-        t = self.scene.addText(str(self._AS_Data_Box))
-        t.setFont(self.f)
-        self.scene.setFont(self.f)
-        t.setDefaultTextColor(QColor(Qt.white))
-        t.setX((self.w - t.boundingRect().width()) / 2)
-        t.setY(((self.h - t.boundingRect().height()) / 2) + (
-                                    t.boundingRect().height() / 2))
+        t.setY(self.h - t.boundingRect().height() + 4)
         self.setScene(self.scene)
 
     def getMode(self):
@@ -324,16 +318,16 @@ class Airspeed_Mode(QGraphicsView):
         if Mode != self._Mode_Indicator:
             if Mode == 0:
                 self._Mode_Indicator = 0
-                self._airspeed_mode = "IAS"
+                self._airspeed_mode = "IAS MPH"
             elif Mode == 1:
                 self._Mode_Indicator = 1
-                self._airspeed_mode = "TAS"
+                self._airspeed_mode = "TAS MPH"
             elif Mode == 2:
                 self._Mode_Indicator = 2
-                self._airspeed_mode = "GS"
+                self._airspeed_mode = "GS MPH"
             elif Mode == 3:
                 self._Mode_Indicator = 0
-                self._airspeed_mode = "IAS"
+                self._airspeed_mode = "IAS MPH"
             self.redraw()
 
     def getAS_Data(self):
@@ -348,8 +342,65 @@ class Airspeed_Mode(QGraphicsView):
             elif self._Mode_Indicator == 2:
                 self._AS_Data_Box = int(AS_Data)
         self.redraw()
-
+        
     def setIAS(self, IAS):
         self.setAS_Data(IAS, 0, 0)
 
     airspeed_mode = property(getMode, setMode, getAS_Data, setAS_Data)
+
+class Airspeed_Digit(QGraphicsView):
+    def __init__(self, parent=None):
+        super(Airspeed_Digit, self).__init__(parent)
+        self.setStyleSheet("border: 0px")
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setFocusPolicy(Qt.NoFocus)
+        self._Mode_Indicator = 0
+        self._Airspeed = 0
+        fix.db.get_item("IAS", True).valueChanged[float].connect(self.setAirspeed)
+
+    def resizeEvent(self, event):
+        self.w = self.width()
+        self.h = self.height()
+        self.f = QFont()
+        self.f.setBold(True)
+        self.f.setPixelSize(24)
+
+        dialPen = QPen(QColor(Qt.white))
+        dialPen.setWidth(2)
+
+        self.scene = QGraphicsScene(0, 0, self.w, self.h)
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+
+        t = self.scene.addText(str(self._Airspeed))
+        t.setFont(self.f)
+        self.scene.setFont(self.f)
+        t.setDefaultTextColor(QColor(Qt.white))
+        t.setX((self.w - t.boundingRect().width()) / 2)
+        t.setY(self.h - t.boundingRect().height() + 5)
+        self.setScene(self.scene)
+
+    def redraw(self):
+        self.scene.clear()
+        self.scene.addRect(0, 0, self.w, self.h,
+                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+        
+        t = self.scene.addText(str(self._Airspeed))
+        t.setFont(self.f)
+        self.scene.setFont(self.f)
+        t.setDefaultTextColor(QColor(Qt.white))
+        t.setX((self.w - t.boundingRect().width()) / 2)
+        t.setY(self.h - t.boundingRect().height() + 5)
+        self.setScene(self.scene)
+
+    def getAirspeed(self):
+        return self._Airspeed
+    
+    def setAirspeed(self, airspeed):
+        if airspeed != self._Airspeed:
+            self._Airspeed = int(airspeed)
+            self.redraw()
+
+    airspeed = property(getAirspeed, setAirspeed)

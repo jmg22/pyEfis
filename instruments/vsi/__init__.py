@@ -23,7 +23,6 @@ except:
     from PyQt4.QtGui import *
     from PyQt4.QtCore import *
 
-
 class VSI(QWidget):
     def __init__(self, parent=None):
         super(VSI, self).__init__(parent)
@@ -89,7 +88,7 @@ class VSI(QWidget):
         dial = QPainter(self)
         dial.setRenderHint(QPainter.Antialiasing)
 
-        # Draw the Black Background
+        #Draw the Black Background
         dial.fillRect(0, 0, w, h, Qt.black)
 
         # Insert Background
@@ -107,11 +106,11 @@ class VSI(QWidget):
         dial.setFont(f)
         dial.setBrush(dialBrush)
 
-        # Needle Movement
+        #Needle Movement
         needle = QPolygon([QPoint(5, 0), QPoint(0, +5), QPoint(-5, 0),
-                          QPoint(0, -(h / 2 - 60))])
+                            QPoint(0, -(h / 2 - 60))])
 
-        # dial_angle = self._roc * -0.0338 # 135deg / 4000 fpm
+        #dial_angle = self._roc * -0.0338 # 135deg / 4000 fpm
         dial_angle = self._roc * (self.maxAngle / self.maxRange)
         dial.translate(self.center)
         dial.rotate(dial_angle - 90)
@@ -131,7 +130,7 @@ class VSI(QWidget):
 class AS_Trend_Tape(QGraphicsView):
     def __init__(self, parent=None):
         super(AS_Trend_Tape, self).__init__(parent)
-        self.setStyleSheet("border: 0px")
+        self.setStyleSheet("background-color: rgba(32, 32, 32, 75%)")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setRenderHint(QPainter.Antialiasing)
@@ -151,7 +150,7 @@ class AS_Trend_Tape(QGraphicsView):
         self.scene = QGraphicsScene(0, 0, w, h)
 
         self.scene.addRect(0, 0, w, h,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                           QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10)))
 
         self.scene.addLine(0, h / 2,
                            w, h / 2,
@@ -162,7 +161,7 @@ class AS_Trend_Tape(QGraphicsView):
     def redraw(self):
         self.scene.clear()
         self.scene.addRect(0, 0, self.width(), self.height(),
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                          QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10))) 
 
         self.scene.addLine(0, self.height() / 2,
                            self.width(), self.height() / 2,
@@ -175,9 +174,8 @@ class AS_Trend_Tape(QGraphicsView):
                                len(self._airspeed_trend)) * 60
 
         self.scene.addRect(self.width() / 2, self.height() / 2,
-                           self.width() / 2 + 5,
-                           self._airspeed_diff * -self.pph,
-                           QPen(QColor(Qt.white)), QBrush(QColor(Qt.white)))
+                         self.width() / 2 + 5, self._airspeed_diff * -self.pph,
+                         QPen(QColor(Qt.white)), QBrush(QColor(Qt.white)))
 
         self.setScene(self.scene)
 
@@ -201,7 +199,7 @@ class AS_Trend_Tape(QGraphicsView):
 class Alt_Trend_Tape(QGraphicsView):
     def __init__(self, parent=None):
         super(Alt_Trend_Tape, self).__init__(parent)
-        self.setStyleSheet("border: 0px")
+        self.setStyleSheet("background-color: rgba(32, 32, 32, 75%)")
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setRenderHint(QPainter.Antialiasing)
@@ -221,14 +219,14 @@ class Alt_Trend_Tape(QGraphicsView):
         self.scene = QGraphicsScene(0, 0, w, h)
 
         self.scene.addRect(0, 0, w, h,
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                            QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10))) 
 
         self.setScene(self.scene)
 
     def redraw(self):
         self.scene.clear()
         self.scene.addRect(0, 0, self.width(), self.height(),
-                           QPen(QColor(Qt.black)), QBrush(QColor(Qt.black)))
+                            QPen(QColor(32, 32, 32, 10)), QBrush(QColor(32, 32, 32, 10)))
 
         self.scene.addLine(0, self.height() / 2,
                            self.width(), self.height() / 2,
@@ -238,13 +236,12 @@ class Alt_Trend_Tape(QGraphicsView):
                                len(self._altitude_trend)) * 60
 
         self.scene.addRect(0, self.height() / 2,
-                           self.width() / 2,
-                           self._altitude_diff * -self.pph,
-                           QPen(QColor(Qt.white)), QBrush(QColor(Qt.white)))
+                         self.width() / 2, self._altitude_diff * -self.pph,
+                         QPen(QColor(Qt.white)), QBrush(QColor(Qt.white)))
 
         self.setScene(self.scene)
 
-    def setAltTrend(self, altitude):
+    def setAlt_Trend(self, altitude):
         if altitude != self._altitude:
             if len(self._altitude_trend) == self.freq:
                 del self._altitude_trend[0]
@@ -258,4 +255,4 @@ class Alt_Trend_Tape(QGraphicsView):
             self._altitude = altitude
             self.redraw()
 
-    altimeter = property(setAltTrend)
+    altimeter = property(setAlt_Trend)
